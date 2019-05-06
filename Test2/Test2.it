@@ -1,0 +1,102 @@
+Program (args) 
+{
+	mmEnv = new TaskEnvironment(name: "Simple")
+	  //bind_input(mmEnv, "a", args.input_file)
+	execute(task: "Simple"; environment: mmEnv;initialize: args.matrix_dim)
+	//bind_output(mmEnv, "times", args.times)
+//	bind_output(mmEnv, "end_time", args.time2)
+}
+Function getStartTime(x){
+	@Extern {
+		@Language "C++"
+		@Includes {cstdlib, sys/time.h, stdio.h, unistd.h}
+		${
+			struct timeval start, end;
+    			long mtime, seconds, useconds;    
+    			gettimeofday(&start, NULL);
+			seconds = start.tv_sec;
+			useconds = start.tv_usec;
+   			mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+    			printf("Start Time: %ld\n", mtime);
+		}$
+	}
+}
+Function getEndTime(x){
+        @Extern {
+                @Language "C++"
+                @Includes {cstdlib, sys/time.h, stdio.h, unistd.h}
+                ${
+                        struct timeval start, end;
+                        long mtime, seconds, useconds;    
+                        gettimeofday(&start, NULL);
+                        seconds = start.tv_sec;
+                        useconds = start.tv_usec;
+                        mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+                        printf("End Time: %ld\n", mtime);
+                }$
+        }
+}
+
+
+//Class Coord:
+//	x_cord,y_cord : Integer
+
+Task "Simple":
+        Define:
+		a: 2d Array of Integer
+		b: Integer
+	Environment:
+		b: create
+	Initialize(matrix_dim): 
+        	a.dimension1.range.min = 0
+		a.dimension1.range.max = matrix_dim
+		a.dimension2.range.min = 0
+		a.dimension2.range.max = matrix_dim
+		
+	Stages:
+		func(m){
+			do { 
+				//m[i][j].x_cord = i
+				//m[i][j].y_cord = j
+				m[i][j] = 1
+			   } for i, j in m
+			}
+		setStartTime(x){
+			getStartTime(x)
+		}	
+		setEndTime(x){
+			getEndTime(x)
+		}
+        Computation:
+			Space A {
+				Space B {
+					setStartTime(1)
+					Space C {
+						func(a)
+						setEndTime(1)
+					}
+				}
+
+			}
+		
+	//you can map Space A to segment and space B to core
+	//k should be >= (dim1 of matrix a/no of nodes)
+	//l has to be >= (dim2 of matrix a/no of cores)
+	// Partition (k,l,m,n):
+	Partition:
+		Space A <un-partitioned> {
+		      	a
+		}
+		Space B <2d> divides Space A partitions{
+		      	a: block_count(4,5)
+			//a: block_count(20,1) 
+			// other dimension stays same (1d partitioning)
+		}
+		Space C <2d> divides Space B partitions{
+		      	a: block_count(20,20)
+                }
+		// 1d partition will partiion the matrix into rows or columns, depending on dim1 or dim2 (look at MM for specs)
+		// replicated: get the entirety of the dimension 
+		// a: block_size(k),replicated
+		// a: replicted, block_size(k)
+		// possible to have Space B be 1-d, space C 1-d

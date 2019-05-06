@@ -1,0 +1,19 @@
+
+Due to MODULEPATH changes the following have been reloaded:
+  1) openmpi/2.1.5
+
+The following have been reloaded with a version change:
+  1) gcc/5.4.0 => gcc/7.1.0
+
+slurmstepd: error: *** JOB 4487457 ON udc-ba34-16c2 CANCELLED AT 2019-05-03T13:40:05 DUE TO TIME LIMIT ***
+--------------------------------------------------------------------------
+ORTE has lost communication with a remote daemon.
+
+  HNP daemon   : [[33317,0],0] on node udc-ba34-16c2
+  Remote daemon: [[33317,0],10] on node udc-ba35-16c3
+
+This is usually due to either a failure of the TCP network
+connection to the node, or possibly an internal failure of
+the daemon itself. We cannot recover from this failure, and
+therefore will terminate the job.
+--------------------------------------------------------------------------
