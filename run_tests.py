@@ -6,7 +6,7 @@ import re
 
 # Directories where your .it files can be found, each directory should only have *one* .it file and *one* .map file
 # Results from the tests will be stored in the respective directory as well
-test_directories = ["Tests/Test1/"]#, "Tests/Test2/", "Tests/Test3/", "Tests/Test4/", "Tests/Test5/", "Tests/Test6"]
+test_directories = ["ITPCS_Benchmarking/Test1/", "ITPCS_Benchmarking/Test2/", "ITPCS_Benchmarking/Test3/", "ITPCS_Benchmarking/Test4/", "ITPCS_Benchmarking/Test5/"]
 
 # Number of Tests you want to conduct
 num_iterations = 3
@@ -37,7 +37,7 @@ for test_directory in test_directories:
 	if not test_directory.endswith("/"):
 		test_directory += "/"
 	# Replace Tests path with ITPCS_Benchmarking
-	subprocess.call(["cp" ,"Tests/resources/parse_results.py", test_directory])
+	subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", test_directory])
 	
 	subprocess.call(["mkdir", test_directory + "slurm_files"])
 	subprocess.call(["mkdir", test_directory + "output_files"])
@@ -59,7 +59,7 @@ for test_directory in test_directories:
 
 	# Replace the Tests paths with ITPCS_Benchmarking/			
 	subprocess.call(["make", "clean", "-f", "MakeFile-Executable"])
-	subprocess.call(["./sicc",test_directory + file_name,"Tests/resources/rivana-cluster.ml", "Tests/resources/rivana-cluster.cn", test_directory + map_name]) 
+	subprocess.call(["./sicc",test_directory + file_name,"ITPCS_Benchmarking/resources/rivana-cluster.ml", "ITPCS_Benchmarking/resources/rivana-cluster.cn", test_directory + map_name]) 
 	subprocess.call(["make", "-f", "MakeFile-Executable"])
 	subprocess.call(["mv","bin/it-program.o",test_directory])
 	
