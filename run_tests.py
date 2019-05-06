@@ -37,7 +37,7 @@ for test_directory in test_directories:
 	if not test_directory.endswith("/"):
 		test_directory += "/"
 	# Replace Tests path with ITPCS_Benchmarking
-	subprocess.call(["cp" ,"Tests/parse_results.py", test_directory])
+	subprocess.call(["cp" ,"Tests/resources/parse_results.py", test_directory])
 	
 	subprocess.call(["mkdir", test_directory + "slurm_files"])
 	subprocess.call(["mkdir", test_directory + "output_files"])
@@ -59,7 +59,7 @@ for test_directory in test_directories:
 
 	# Replace the Tests paths with ITPCS_Benchmarking/			
 	subprocess.call(["make", "clean", "-f", "MakeFile-Executable"])
-	subprocess.call(["./sicc",test_directory + file_name,"Tests/rivana-cluster.ml", "Tests/rivana-cluster.cn", test_directory + map_name]) 
+	subprocess.call(["./sicc",test_directory + file_name,"Tests/resources/rivana-cluster.ml", "Tests/resources/rivana-cluster.cn", test_directory + map_name]) 
 	subprocess.call(["make", "-f", "MakeFile-Executable"])
 	subprocess.call(["mv","bin/it-program.o",test_directory])
 	
@@ -84,4 +84,10 @@ for test_directory in test_directories:
 			slurm_file.close()
 			subprocess.call(["sbatch", prefix + ".slurm"])			
 			subprocess.call(["mv", prefix + ".slurm", test_directory + "slurm_files/"])
-			
+	parse_file = open(test_directory + "parse_info.txt", 'w')
+	dims = ""
+	for dim in dim_matrix:
+		dims += ","+str(dim)
+	parse_file.write(str(num_iterations) + dims)
+	parse_file.close()
+	print("Successfully submitted jobs for " + file_name)	
