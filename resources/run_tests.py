@@ -6,7 +6,7 @@ import re
 
 # Directories where your .it files can be found, each directory should only have *one* .it file and *one* .map file
 # Results from the tests will be stored in the respective directory as well
-test_directories = ["ITPCS_Benchmarking/Test1/", "ITPCS_Benchmarking/Test2/", "ITPCS_Benchmarking/Test3/", "ITPCS_Benchmarking/Test4/", "ITPCS_Benchmarking/Test5/"]
+test_directories = ["ITPCS_Benchmarking/Test1/"]#, "ITPCS_Benchmarking/Test2/", "ITPCS_Benchmarking/Test3/", "ITPCS_Benchmarking/Test4/", "ITPCS_Benchmarking/Test5/"]
 
 # Number of Tests you want to conduct
 num_iterations = 3
@@ -31,13 +31,13 @@ else:
 
 
 
-
+subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", "."])
 for test_directory in test_directories:
 	
 	if not test_directory.endswith("/"):
 		test_directory += "/"
 	# Replace Tests path with ITPCS_Benchmarking
-	subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", test_directory])
+	#subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", test_directory])
 	
 	subprocess.call(["mkdir", test_directory + "slurm_files"])
 	subprocess.call(["mkdir", test_directory + "output_files"])
@@ -84,10 +84,15 @@ for test_directory in test_directories:
 			slurm_file.close()
 			subprocess.call(["sbatch", prefix + ".slurm"])			
 			subprocess.call(["mv", prefix + ".slurm", test_directory + "slurm_files/"])
-	parse_file = open(test_directory + "parse_info.txt", 'w')
-	dims = ""
-	for dim in dim_matrix:
-		dims += ","+str(dim)
-	parse_file.write(str(num_iterations) + dims)
-	parse_file.close()
-	print("Successfully submitted jobs for " + file_name)	
+
+parse_file = open("parse_info.txt", 'w')
+dims = ""
+directories = ""
+for dim in dim_matrix:
+	dims += str(dim) + ","
+
+for d in test_directories:
+	directories += d + ","
+parse_file.write(str(num_iterations) + "\n" + dims + "\n" + directories)
+parse_file.close()
+print("Successfully submitted jobs for " + file_name)	
