@@ -9,8 +9,7 @@ f = open('parse_info.txt','r')
 parse_info = f.read().split(',')
 iterations = int(parse_info[0])
 dim_matrix = [int(x) for x in parse_info[1:-1]]
-
-print(iterations)
+print("Parsing results for " + str(iterations) + " iterations of the following dimensions: ")
 print(dim_matrix)
 
 for i in range(iterations):
