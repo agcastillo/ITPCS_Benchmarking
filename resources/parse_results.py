@@ -43,7 +43,7 @@ for i in range(iterations):
                                 avg_start = sum(start_times)/len(start_times) 
                                 avg_end = sum(end_times)/len(end_times)
                                 delta = avg_end - avg_start 
-                                f.write(str(dim) + "," + str(delta) "\n")
+                                f.write(str(dim) + "," + str(delta)+ "\n")
                         else:
                                 f.write(str(dim) + ",NA" + "\n")
 
