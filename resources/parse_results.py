@@ -7,7 +7,7 @@ dim_matrix = []
 
 f = open('parse_info.txt','r')
 line_split = f.read().split('\n')
-iterations = line_split[0]
+iterations = int(line_split[0])
 dim_matrix = [int(x) for x in line_split[1].split(',')[:-1]]
 paths = line_split[2].split(',')[:-1]
 paths = [x + "output_files/" for x in paths]
@@ -18,16 +18,19 @@ print(dim_matrix)
 
 f = open("results.txt", 'w')
 for path in paths:
+	f.write("***********************************************************************\n")
+	f.write("Test Location: " + path[:-13] + "\n")
+	f.write("***********************************************************************\n")
 	for i in range(iterations):
-		f.write( "\nTEST LOCATION: " + path + "\nTEST ITERATION: " + str(i)) 
+		f.write( "Test Iteration: " + str(i)+ "\n") 
 		for dim in dim_matrix:
 			start_times = []
 			end_times = []
-			filename = "slurm_" + str(dim) + "_" + str(i) + ".out"
-			
-			exists = os.path.isfile(path + "output_files/" + filename)
+			filename = path  + "slurm_" + str(dim) + "_" + str(i) + ".out"
+				
+			exists = os.path.isfile(filename)
 			if exists:
-				for line in open(path + "output_files/" + filename, 'r'):
+				for line in open( filename, 'r'):
 					
 					if "Start Time:" in line:
 						try:
@@ -47,12 +50,13 @@ for path in paths:
 					avg_start = sum(start_times)/len(start_times) 
 					avg_end = sum(end_times)/len(end_times)
 					delta = avg_end - avg_start 
-					f.write("\n\t" + str(dim) + "," + str(delta))
+					f.write("\t| Dim = " + str(dim) + ", Time (ms) = " + str(delta)+ "\n")
 				else:
-					f.write("\n\t" + str(dim) + ",NA")
+					f.write("\t| Dim = " + str(dim) + ", Time (ms) = NA"+ "\n")
 
 			else:
-				print(filename + " was not found in /output_files/")
+				print( filename + " was not found")
+		f.write("\n")
 
 
 

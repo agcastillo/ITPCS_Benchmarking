@@ -6,7 +6,7 @@ import re
 
 # Directories where your .it files can be found, each directory should only have *one* .it file and *one* .map file
 # Results from the tests will be stored in the respective directory as well
-test_directories = ["ITPCS_Benchmarking/Test1/"]#, "ITPCS_Benchmarking/Test2/", "ITPCS_Benchmarking/Test3/", "ITPCS_Benchmarking/Test4/", "ITPCS_Benchmarking/Test5/"]
+test_directories = ["ITPCS_Benchmarking/Test1/", "ITPCS_Benchmarking/Test2/", "ITPCS_Benchmarking/Test3/", "ITPCS_Benchmarking/Test4/", "ITPCS_Benchmarking/Test5/"]
 
 # Number of Tests you want to conduct
 num_iterations = 3
