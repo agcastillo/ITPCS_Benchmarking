@@ -30,17 +30,21 @@ else:
 	os.system("make -f MakeFile-Compiler")
 
 
-
+# Copy the results parser into the current directory
 subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", "."])
-for test_directory in test_directories:
+
+
+for test_directory in test_directories:	
 	
 	if not test_directory.endswith("/"):
 		test_directory += "/"
-	# Replace Tests path with ITPCS_Benchmarking
-	#subprocess.call(["cp" ,"ITPCS_Benchmarking/resources/parse_results.py", test_directory])
 	
+	# Make directories to store slurm files and output files in
 	subprocess.call(["mkdir", test_directory + "slurm_files"])
 	subprocess.call(["mkdir", test_directory + "output_files"])
+
+	# Find .it and .map files in the given directory
+	# Skip this directory if either file doesn't exist
 	file_name = None
 	map_name = None
 	for file in os.listdir(test_directory):
@@ -57,15 +61,18 @@ for test_directory in test_directories:
 		print("No file with .map extension found in " + test_directory)
 		continue
 
-	# Replace the Tests paths with ITPCS_Benchmarking/			
+	# Compile the IT file and move the fully compiled .o file to the test directory
 	subprocess.call(["make", "clean", "-f", "MakeFile-Executable"])
 	subprocess.call(["./sicc",test_directory + file_name,"ITPCS_Benchmarking/resources/rivana-cluster.ml", "ITPCS_Benchmarking/resources/rivana-cluster.cn", test_directory + map_name]) 
 	subprocess.call(["make", "-f", "MakeFile-Executable"])
 	subprocess.call(["mv","bin/it-program.o",test_directory])
 	
+	# Job submissions happen here
 	for i in range(num_iterations):
 		for dim in dim_matrix:
 			prefix = file_name[:-3] + "_" + str(dim) + "_" + str(i)
+			
+			# Create a new slurm file for each compiled IT file, for each iteration, and for each matrix dimension we want to test
 			slurm_file = open(prefix + ".slurm",'w')
 			slurm_file.write("#!/bin/bash"
 					+"\n#SBATCH --nodes="+node_count
@@ -82,17 +89,31 @@ for test_directory in test_directories:
 					+"\nmpirun " + test_directory + "it-program.o matrix_dim=" + str(dim) 
 					+"\n")
 			slurm_file.close()
+			
+			# Submit job and move slurm file to the slurm_files directory
 			subprocess.call(["sbatch", prefix + ".slurm"])			
 			subprocess.call(["mv", prefix + ".slurm", test_directory + "slurm_files/"])
-
+			
+			
+# Create a file that will hold information necessary for parsing			
 parse_file = open("parse_info.txt", 'w')
 dims = ""
 directories = ""
-for dim in dim_matrix:
+for dim in dim_matrix:e
 	dims += str(dim) + ","
 
 for d in test_directories:
 	directories += d + ","
 parse_file.write(str(num_iterations) + "\n" + dims + "\n" + directories)
 parse_file.close()
-print("Successfully submitted jobs for " + file_name)	
+
+# Signal script end
+print("Successfully submitted jobs for " + file_name)
+
+
+
+
+
+
+
+	
